@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Instant British penny value lookup. Type any year from 1797-1967 to see potential values from Fine to MS66. Discover what your old penny could be worth.">
+  <title>What's My Penny Worth? - British Penny Value Finder</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="canonical" href="https://britishpennies.com/pages/value-finder.html">
+  <style>
+    .search-hero {
+      background: linear-gradient(135deg, #8B4513 0%, #2C2C2C 100%);
+      padding: 3rem 2rem;
+      text-align: center;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .search-hero .coin-decoration {
+      position: absolute;
+      opacity: 0.15;
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+    }
+    .search-hero .coin-left {
+      left: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .search-hero .coin-right {
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    @media (max-width: 900px) {
+      .search-hero .coin-decoration { display: none; }
+    }
+    .search-hero h2 {
+      color: #CD7F32;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      border: none;
+      padding: 0;
+    }
+    .search-hero p {
+      color: rgba(255,255,255,0.9);
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    #yearSearch {
+      font-size: 3rem;
+      padding: 1rem 2rem;
+      width: 200px;
+      text-align: center;
+      border: 3px solid #CD7F32;
+      border-radius: 8px;
+      background: white;
+      color: #2C2C2C;
+      font-family: 'Georgia', serif;
+    }
+    #yearSearch:focus {
+      outline: none;
+      border-color: #B87333;
+      box-shadow: 0 0 20px rgba(205, 127, 50, 0.5);
+    }
+    #yearSearch::placeholder {
+      color: #999;
+      font-size: 1.5rem;
+    }
+    .result-card {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      display: none;
+    }
+    .result-card.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .result-card h3 {
+      font-size: 2rem;
+      color: #8B4513;
+      margin-bottom: 0.5rem;
+    }
+    .result-card .monarch {
+      color: #4A7C59;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+    .max-value {
+      background: linear-gradient(135deg, #CD7F32, #8B4513);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      margin: 1.5rem 0;
+    }
+    .max-value .label {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0.9;
+    }
+    .max-value .amount {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin: 0.5rem 0;
+    }
+    .max-value .note {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    .grade-table {
+      width: 100%;
+      margin: 1rem 0;
+    }
+    .grade-table th {
+      background: #2C2C2C;
+      padding: 0.75rem;
+    }
+    .grade-table td {
+      text-align: center;
+      padding: 0.75rem;
+    }
+    .highlight-cell {
+      background: #FFF8DC;
+      font-weight: bold;
+      color: #8B4513;
+    }
+    .rarity-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-left: 0.5rem;
+    }
+    .rarity-common { background: #e8f5e9; color: #2e7d32; }
+    .rarity-scarce { background: #fff3e0; color: #ef6c00; }
+    .rarity-rare { background: #ffebee; color: #c62828; }
+    .rarity-legendary { background: #f3e5f5; color: #7b1fa2; }
+    .tips-box {
+      background: #f8f6f2;
+      border-left: 4px solid #B87333;
+      padding: 1rem 1.5rem;
+      margin-top: 1rem;
+    }
+    .tips-box h4 {
+      color: #8B4513;
+      margin-bottom: 0.5rem;
+    }
+    .no-result {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+    .browse-years {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+    .year-btn {
+      padding: 0.5rem 1rem;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Georgia', serif;
+    }
+    .year-btn:hover {
+      background: #CD7F32;
+      color: white;
+      border-color: #CD7F32;
+    }
+    .year-btn.key-date {
+      background: #fff3e0;
+      border-color: #ef6c00;
+      color: #ef6c00;
+    }
+    .year-btn.key-date:hover {
+      background: #ef6c00;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>British <span>Pennies</span></h1>
+      <p class="tagline">What's Your Penny Worth?</p>
+    </div>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="large-pennies.html">Large Pennies</a></li>
+      <li><a href="small-pennies.html">Small Pennies</a></li>
+      <li><a href="key-dates.html">Key Dates</a></li>
+      <li><a href="grading.html">Grading Guide</a></li>
+      <li><a href="varieties.html">Varieties</a></li>
+      <li><a href="value-finder.html" class="active">Value Finder</a></li>
+      <li><a href="resources.html">Resources</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="search-hero">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/British_One_Penny_1797_obverse.png/120px-British_One_Penny_1797_obverse.png" alt="" class="coin-decoration coin-left" loading="lazy">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/One_Penny_1912-2.JPG/120px-One_Penny_1912-2.JPG" alt="" class="coin-decoration coin-right" loading="lazy">
+      <h2>What Year Is Your Penny?</h2>
+      <p>Type the year below to discover its potential value</p>
+      <input type="text" id="yearSearch" placeholder="1869" maxlength="4" autocomplete="off">
+    </div>
+
+    <div id="resultCard" class="result-card"></div>
+
+    <div id="noResult" class="result-card">
+      <div class="no-result">
+        <h3>Enter a year between 1797 and 1967</h3>
+        <p>Or browse key dates below:</p>
+        <div class="browse-years">
+          <button class="year-btn key-date" onclick="searchYear('1933')">1933</button>
+          <button class="year-btn key-date" onclick="searchYear('1869')">1869</button>
+          <button class="year-btn key-date" onclick="searchYear('1871')">1871</button>
+          <button class="year-btn key-date" onclick="searchYear('1918')">1918 KN</button>
+          <button class="year-btn key-date" onclick="searchYear('1919')">1919 KN</button>
+          <button class="year-btn key-date" onclick="searchYear('1797')">1797</button>
+          <button class="year-btn" onclick="searchYear('1860')">1860</button>
+          <button class="year-btn" onclick="searchYear('1901')">1901</button>
+          <button class="year-btn" onclick="searchYear('1950')">1950</button>
+          <button class="year-btn" onclick="searchYear('1967')">1967</button>
+        </div>
+      </div>
+    </div>
+
+    <section>
+      <h2>Could Your Penny Be Worth Thousands?</h2>
+      <p>British pennies might look ordinary, but certain dates and conditions can make them extraordinarily valuable. A 1933 penny in your collection? That's a <strong>six-figure coin</strong>. Even common dates in pristine, uncirculated condition with original red luster can fetch surprising premiums.</p>
+
+      <div class="grid-3">
+        <div class="card">
+          <h3>Grade Matters</h3>
+          <p>A penny worth $2 in Fine condition might be worth $500+ in MS66 Red. The difference between worn and uncirculated can be 100x or more.</p>
+        </div>
+        <div class="card">
+          <h3>Color Counts</h3>
+          <p>Bronze pennies with original "Red" (RD) luster command massive premiums over brown (BN) coins. A common date in MS66 Red can be worth more than a key date in Fine.</p>
+        </div>
+        <div class="card">
+          <h3>Varieties Add Value</h3>
+          <p>Overdates (1848/7), mintmarks (H, KN), and die varieties can multiply a coin's value dramatically. Know what to look for!</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2024 BritishPennies.com. Values are estimates for typical examples. Always verify with recent auction results.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Comprehensive British Penny Database (1797-1967)
+    const pennyData = {
+      // George III - Cartwheel Era
+      1797: { monarch: "George III", type: "Cartwheel Copper", rarity: "common", f: 30, vf: 60, xf: 150, au: 300, ms60: 500, ms63: 1200, ms66: 4000, max: 8000, notes: "The famous 'Cartwheel' penny - 1 oz of pure copper. Proof strikes command huge premiums." },
+      1806: { monarch: "George III", type: "Soho Mint Copper", rarity: "common", f: 15, vf: 35, xf: 100, au: 200, ms60: 350, ms63: 800, ms66: 2500, max: 5000, notes: "Later Soho Mint issue. Look for K on truncation varieties." },
+      1807: { monarch: "George III", type: "Soho Mint Copper", rarity: "common", f: 15, vf: 35, xf: 100, au: 200, ms60: 350, ms63: 800, ms66: 2500, max: 5000, notes: "Final George III penny. K varieties exist." },
+
+      // George IV
+      1825: { monarch: "George IV", type: "Copper", rarity: "scarce", f: 40, vf: 100, xf: 250, au: 500, ms60: 800, ms63: 1800, ms66: 6000, max: 12000, notes: "First year of new Royal Mint pennies. Often weakly struck." },
+      1826: { monarch: "George IV", type: "Copper", rarity: "common", f: 15, vf: 40, xf: 100, au: 200, ms60: 400, ms63: 1000, ms66: 3500, max: 7000, notes: "More available than 1825. Decent strike quality." },
+      1827: { monarch: "George IV", type: "Copper", rarity: "rare", f: 120, vf: 180, xf: 400, au: 800, ms60: 1200, ms63: 2500, ms66: 10000, max: 20000, notes: "KEY DATE - Low mintage makes this genuinely scarce." },
+
+      // William IV
+      1831: { monarch: "William IV", type: "Copper", rarity: "scarce", f: 50, vf: 120, xf: 300, au: 600, ms60: 1000, ms63: 2200, ms66: 8000, max: 15000, notes: "W.W. on truncation variety commands premium. Underrated series." },
+      1834: { monarch: "William IV", type: "Copper", rarity: "rare", f: 80, vf: 180, xf: 450, au: 900, ms60: 1500, ms63: 3500, ms66: 12000, max: 25000, notes: "Low mintage - genuinely difficult in any grade." },
+      1837: { monarch: "William IV", type: "Copper", rarity: "rare", f: 100, vf: 250, xf: 600, au: 1200, ms60: 2000, ms63: 4500, ms66: 15000, max: 30000, notes: "KEY DATE - Final year, lowest mintage. Trophy coin in high grade." },
+
+      // Victoria Copper (Young Head)
+      1839: { monarch: "Victoria", type: "Copper (Proof Only)", rarity: "rare", f: 500, vf: 700, xf: 1000, au: 1500, ms60: 2000, ms63: 3500, ms66: 8000, max: 15000, notes: "Proof only year. All are technically proofs." },
+      1841: { monarch: "Victoria", type: "Copper", rarity: "scarce", f: 25, vf: 60, xf: 150, au: 300, ms60: 500, ms63: 1200, ms66: 4000, max: 8000, notes: "First regular Victoria copper. REG: vs REG varieties." },
+      1843: { monarch: "Victoria", type: "Copper", rarity: "scarce", f: 35, vf: 90, xf: 220, au: 450, ms60: 750, ms63: 1800, ms66: 6000, max: 12000, notes: "Scarcer than many realize. Nice problem-free examples tough." },
+      1844: { monarch: "Victoria", type: "Copper", rarity: "rare", f: 60, vf: 150, xf: 400, au: 800, ms60: 1400, ms63: 3200, ms66: 10000, max: 20000, notes: "Low mintage year. Underrated key date." },
+      1845: { monarch: "Victoria", type: "Copper", rarity: "scarce", f: 30, vf: 80, xf: 200, au: 400, ms60: 700, ms63: 1600, ms66: 5500, max: 11000, notes: "Moderate scarcity. Colon varieties exist." },
+      1846: { monarch: "Victoria", type: "Copper", rarity: "common", f: 18, vf: 50, xf: 130, au: 260, ms60: 450, ms63: 1100, ms66: 3800, max: 7500, notes: "More available. DEF: varieties." },
+      1847: { monarch: "Victoria", type: "Copper", rarity: "scarce", f: 30, vf: 80, xf: 200, au: 400, ms60: 700, ms63: 1600, ms66: 5500, max: 11000, notes: "Moderate scarcity level." },
+      1848: { monarch: "Victoria", type: "Copper", rarity: "rare", f: 60, vf: 150, xf: 400, au: 800, ms60: 1400, ms63: 3200, ms66: 10000, max: 20000, notes: "KEY - 1848/7 overdate variety worth 2-3x these prices!" },
+      1849: { monarch: "Victoria", type: "Copper", rarity: "scarce", f: 35, vf: 100, xf: 250, au: 500, ms60: 850, ms63: 2000, ms66: 7000, max: 14000, notes: "Decent scarcity. Watch for cleaned examples." },
+      1851: { monarch: "Victoria", type: "Copper", rarity: "scarce", f: 30, vf: 80, xf: 200, au: 400, ms60: 700, ms63: 1600, ms66: 5500, max: 11000, notes: "Similar to other early 1850s." },
+      1853: { monarch: "Victoria", type: "Copper", rarity: "common", f: 12, vf: 30, xf: 80, au: 160, ms60: 280, ms63: 700, ms66: 2500, max: 5000, notes: "High mintage, readily available." },
+      1854: { monarch: "Victoria", type: "Copper", rarity: "common", f: 12, vf: 30, xf: 80, au: 160, ms60: 280, ms63: 700, ms66: 2500, max: 5000, notes: "Similar to 1853. Plain and ornamental trident." },
+      1855: { monarch: "Victoria", type: "Copper", rarity: "common", f: 12, vf: 30, xf: 80, au: 160, ms60: 280, ms63: 700, ms66: 2500, max: 5000, notes: "Common date, nice in high grade." },
+      1856: { monarch: "Victoria", type: "Copper", rarity: "scarce", f: 25, vf: 60, xf: 150, au: 300, ms60: 500, ms63: 1200, ms66: 4200, max: 8500, notes: "Slightly scarcer. Plain and ornamental trident." },
+      1857: { monarch: "Victoria", type: "Copper", rarity: "common", f: 18, vf: 45, xf: 120, au: 240, ms60: 420, ms63: 1000, ms66: 3600, max: 7000, notes: "Plain and ornamental varieties." },
+      1858: { monarch: "Victoria", type: "Copper", rarity: "common", f: 12, vf: 30, xf: 80, au: 160, ms60: 280, ms63: 700, ms66: 2500, max: 5000, notes: "1858/7 overdate variety commands premium." },
+      1859: { monarch: "Victoria", type: "Copper", rarity: "common", f: 15, vf: 38, xf: 95, au: 190, ms60: 330, ms63: 820, ms66: 2900, max: 5800, notes: "Final year of large copper before bronze transition." },
+
+      // Victoria Bronze (Bun Head 1860-1894)
+      1860: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 8, vf: 20, xf: 60, au: 120, ms60: 200, ms63: 500, ms66: 1800, max: 4000, notes: "TRANSITION YEAR - Beaded vs toothed border varieties. L.C.W. varieties." },
+      1861: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "6+6 variety exists. High mintage." },
+      1862: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 10, vf: 25, xf: 100, au: 200, ms60: 250, ms63: 450, ms66: 2000, max: 3000, notes: "8/6 overdate known. Die number varieties." },
+      1863: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "Die numbers varieties collectible." },
+      1864: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "rare", f: 40, vf: 175, xf: 700, au: 1500, ms60: 2000, ms63: 3500, ms66: 10000, max: 30000, notes: "KEY DATE - Crosslet 4 variety drives huge premiums. Plain 4 also scarce." },
+      1865: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 6, vf: 15, xf: 45, au: 90, ms60: 150, ms63: 380, ms66: 1400, max: 3000, notes: "5/3 overdate variety exists." },
+      1866: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "Standard issue. Nice in red." },
+      1867: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 6, vf: 15, xf: 45, au: 90, ms60: 150, ms63: 380, ms66: 1400, max: 3000, notes: "Moderate availability." },
+      1868: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "scarce", f: 20, vf: 50, xf: 150, au: 300, ms60: 500, ms63: 1200, ms66: 4000, max: 8000, notes: "Lower mintage than adjacent years." },
+      1869: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "rare", f: 150, vf: 350, xf: 900, au: 2400, ms60: 2700, ms63: 3700, ms66: 8000, max: 40000, notes: "MAJOR KEY DATE - Low survival rate. ANY grade is noteworthy." },
+      1870: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 6, vf: 15, xf: 45, au: 90, ms60: 150, ms63: 380, ms66: 1400, max: 3000, notes: "Back to normal mintage." },
+      1871: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "rare", f: 120, vf: 280, xf: 700, au: 1800, ms60: 2200, ms63: 3000, ms66: 6500, max: 30000, notes: "MAJOR KEY DATE - Lowest mintage Victoria bronze. Very difficult." },
+      1872: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "High mintage, readily available." },
+      1873: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "Similar to 1872." },
+      1874: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 6, vf: 15, xf: 45, au: 90, ms60: 150, ms63: 380, ms66: 1400, max: 3000, notes: "H mintmark variety scarcer (2-3x)." },
+      1875: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "H mintmark variety exists." },
+      1876: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "H mintmark only this year." },
+      1877: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "Standard Bun Head." },
+      1878: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "scarce", f: 15, vf: 40, xf: 120, au: 240, ms60: 400, ms63: 950, ms66: 3500, max: 7000, notes: "Lower mintage year." },
+      1879: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "Narrow and wide date varieties." },
+      1880: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 6, vf: 15, xf: 45, au: 90, ms60: 150, ms63: 380, ms66: 1400, max: 3000, notes: "8 over 8 varieties known." },
+      1881: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "H mintmark variety exists." },
+      1882: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "RARE VARIETY: 'No H' (missing mintmark) worth $2,000-8,000!" },
+      1883: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "Standard issue." },
+      1884: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "High mintage." },
+      1885: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "Standard issue." },
+      1886: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "Moderate mintage." },
+      1887: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "Jubilee year (but not for pennies)." },
+      1888: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "Standard issue." },
+      1889: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "14 leaves vs 15 leaves variety." },
+      1890: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "High mintage." },
+      1891: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "High mintage." },
+      1892: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "Standard issue." },
+      1893: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "Standard issue." },
+      1894: { monarch: "Victoria", type: "Bronze Bun Head", rarity: "scarce", f: 12, vf: 30, xf: 90, au: 180, ms60: 300, ms63: 750, ms66: 2800, max: 5500, notes: "Last Bun Head year. Lower mintage." },
+
+      // Victoria Bronze (Old Head 1895-1901)
+      1895: { monarch: "Victoria", type: "Bronze Old Head", rarity: "common", f: 5, vf: 12, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "First Old Head penny. New portrait." },
+      1896: { monarch: "Victoria", type: "Bronze Old Head", rarity: "common", f: 3, vf: 8, xf: 25, au: 50, ms60: 85, ms63: 220, ms66: 900, max: 1800, notes: "High mintage." },
+      1897: { monarch: "Victoria", type: "Bronze Old Head", rarity: "common", f: 3, vf: 8, xf: 25, au: 50, ms60: 85, ms63: 220, ms66: 900, max: 1800, notes: "Normal issue." },
+      1898: { monarch: "Victoria", type: "Bronze Old Head", rarity: "common", f: 4, vf: 10, xf: 30, au: 60, ms60: 100, ms63: 260, ms66: 1000, max: 2000, notes: "Moderate mintage." },
+      1899: { monarch: "Victoria", type: "Bronze Old Head", rarity: "common", f: 3, vf: 8, xf: 25, au: 50, ms60: 85, ms63: 220, ms66: 900, max: 1800, notes: "High mintage." },
+      1900: { monarch: "Victoria", type: "Bronze Old Head", rarity: "common", f: 3, vf: 8, xf: 25, au: 50, ms60: 85, ms63: 220, ms66: 900, max: 1800, notes: "Very high mintage." },
+      1901: { monarch: "Victoria", type: "Bronze Old Head", rarity: "common", f: 4, vf: 10, xf: 30, au: 60, ms60: 100, ms63: 260, ms66: 1000, max: 2000, notes: "Final Victoria penny. Queen died January 1901." },
+
+      // Edward VII (1902-1910)
+      1902: { monarch: "Edward VII", type: "Bronze", rarity: "common", f: 4, vf: 10, xf: 35, au: 70, ms60: 120, ms63: 300, ms66: 1200, max: 2500, notes: "'LOW TIDE' variety worth 2-3x! First Edward VII." },
+      1903: { monarch: "Edward VII", type: "Bronze", rarity: "common", f: 3, vf: 8, xf: 25, au: 50, ms60: 85, ms63: 220, ms66: 900, max: 1800, notes: "Normal issue." },
+      1904: { monarch: "Edward VII", type: "Bronze", rarity: "common", f: 4, vf: 8, xf: 40, au: 110, ms60: 150, ms63: 250, ms66: 600, max: 1000, notes: "Slightly scarcer in high grade." },
+      1905: { monarch: "Edward VII", type: "Bronze", rarity: "common", f: 3, vf: 8, xf: 25, au: 50, ms60: 85, ms63: 220, ms66: 900, max: 1800, notes: "High mintage." },
+      1906: { monarch: "Edward VII", type: "Bronze", rarity: "common", f: 3, vf: 8, xf: 25, au: 50, ms60: 85, ms63: 220, ms66: 900, max: 1800, notes: "Highest mintage of series." },
+      1907: { monarch: "Edward VII", type: "Bronze", rarity: "common", f: 3, vf: 8, xf: 25, au: 50, ms60: 85, ms63: 220, ms66: 900, max: 1800, notes: "Very high mintage." },
+      1908: { monarch: "Edward VII", type: "Bronze", rarity: "common", f: 3, vf: 8, xf: 25, au: 50, ms60: 85, ms63: 220, ms66: 900, max: 1800, notes: "High mintage." },
+      1909: { monarch: "Edward VII", type: "Bronze", rarity: "common", f: 3, vf: 8, xf: 25, au: 50, ms60: 85, ms63: 220, ms66: 900, max: 1800, notes: "Normal issue." },
+      1910: { monarch: "Edward VII", type: "Bronze", rarity: "common", f: 4, vf: 10, xf: 30, au: 60, ms60: 100, ms63: 260, ms66: 1000, max: 2000, notes: "Final Edward VII. King died May 1910." },
+
+      // George V (1911-1936)
+      1911: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 15, au: 35, ms60: 60, ms63: 150, ms66: 600, max: 1200, notes: "First George V penny." },
+      1912: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 15, au: 35, ms60: 60, ms63: 150, ms66: 600, max: 1200, notes: "H mintmark variety worth 2-3x." },
+      1913: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 15, au: 35, ms60: 60, ms63: 150, ms66: 600, max: 1200, notes: "High mintage." },
+      1914: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 15, au: 35, ms60: 60, ms63: 150, ms66: 600, max: 1200, notes: "WWI begins. High production." },
+      1915: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 15, au: 35, ms60: 60, ms63: 150, ms66: 600, max: 1200, notes: "Wartime issue." },
+      1916: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 15, au: 35, ms60: 60, ms63: 150, ms66: 600, max: 1200, notes: "High wartime mintage." },
+      1917: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 15, au: 35, ms60: 60, ms63: 150, ms66: 600, max: 1200, notes: "Highest single-year mintage of series." },
+      1918: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 15, au: 35, ms60: 60, ms63: 150, ms66: 600, max: 1200, notes: "KEY VARIETIES: H mintmark (3x), KN mintmark (50-100x)!" },
+      1919: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 15, au: 35, ms60: 60, ms63: 150, ms66: 600, max: 1200, notes: "KEY VARIETIES: H mintmark (3x), KN mintmark (30-50x)!" },
+      1920: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 15, au: 35, ms60: 60, ms63: 150, ms66: 600, max: 1200, notes: "Post-war high mintage." },
+      1921: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 10, au: 30, ms60: 40, ms63: 80, ms66: 250, max: 500, notes: "Very high mintage." },
+      1922: { monarch: "George V", type: "Bronze", rarity: "scarce", f: 5, vf: 12, xf: 35, au: 80, ms60: 130, ms63: 320, ms66: 1200, max: 2400, notes: "Lower mintage year." },
+      1926: { monarch: "George V", type: "Bronze", rarity: "scarce", f: 6, vf: 25, xf: 150, au: 300, ms60: 350, ms63: 500, ms66: 2000, max: 2500, notes: "MODIFIED EFFIGY variety commands huge premiums!" },
+      1927: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 10, au: 30, ms60: 40, ms63: 80, ms66: 250, max: 500, notes: "First year of smaller head." },
+      1928: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 10, au: 30, ms60: 40, ms63: 80, ms66: 250, max: 500, notes: "Smaller head type continues." },
+      1929: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 10, au: 30, ms60: 40, ms63: 80, ms66: 250, max: 500, notes: "Standard small head." },
+      1930: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 10, au: 30, ms60: 40, ms63: 80, ms66: 250, max: 500, notes: "Standard issue." },
+      1931: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 12, au: 35, ms60: 55, ms63: 120, ms66: 400, max: 800, notes: "Lower mintage than adjacent years." },
+      1932: { monarch: "George V", type: "Bronze", rarity: "common", f: 3, vf: 8, xf: 25, au: 60, ms60: 100, ms63: 250, ms66: 900, max: 1800, notes: "Lowest non-1933 mintage. Moderately scarce." },
+      1933: { monarch: "George V", type: "Bronze", rarity: "legendary", f: 120000, vf: 140000, xf: 160000, au: 175000, ms60: 190000, ms63: 210000, ms66: 230000, max: 300000, notes: "HOLY GRAIL - Only 6-7 exist. ANY genuine example is six figures. Beware fakes!" },
+      1934: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 12, au: 35, ms60: 55, ms63: 120, ms66: 400, max: 800, notes: "Lower mintage." },
+      1935: { monarch: "George V", type: "Bronze", rarity: "common", f: 2, vf: 5, xf: 10, au: 30, ms60: 40, ms63: 80, ms66: 250, max: 500, notes: "Silver Jubilee year." },
+      1936: { monarch: "George V", type: "Bronze", rarity: "common", f: 1, vf: 3, xf: 8, au: 20, ms60: 30, ms63: 60, ms66: 200, max: 400, notes: "Final George V. Massive mintage." },
+
+      // George VI (1937-1952)
+      1937: { monarch: "George VI", type: "Bronze", rarity: "common", f: 1, vf: 2, xf: 5, au: 12, ms60: 20, ms63: 45, ms66: 180, max: 350, notes: "First George VI. New reverse design." },
+      1938: { monarch: "George VI", type: "Bronze", rarity: "common", f: 1, vf: 2, xf: 5, au: 12, ms60: 20, ms63: 45, ms66: 180, max: 350, notes: "High mintage." },
+      1939: { monarch: "George VI", type: "Bronze", rarity: "common", f: 1, vf: 2, xf: 5, au: 12, ms60: 20, ms63: 45, ms66: 180, max: 350, notes: "WWII begins." },
+      1940: { monarch: "George VI", type: "Bronze", rarity: "common", f: 1, vf: 3, xf: 8, au: 18, ms60: 30, ms63: 70, ms66: 280, max: 550, notes: "Wartime. Lower mintage." },
+      1944: { monarch: "George VI", type: "Bronze", rarity: "common", f: 1, vf: 2, xf: 5, au: 12, ms60: 20, ms63: 45, ms66: 180, max: 350, notes: "No 1941-43 pennies struck!" },
+      1945: { monarch: "George VI", type: "Bronze", rarity: "common", f: 1, vf: 2, xf: 5, au: 12, ms60: 20, ms63: 45, ms66: 180, max: 350, notes: "Victory year." },
+      1946: { monarch: "George VI", type: "Bronze", rarity: "common", f: 1, vf: 2, xf: 5, au: 12, ms60: 20, ms63: 45, ms66: 180, max: 350, notes: "Post-war." },
+      1947: { monarch: "George VI", type: "Bronze", rarity: "common", f: 1, vf: 2, xf: 5, au: 12, ms60: 20, ms63: 45, ms66: 180, max: 350, notes: "Standard post-war." },
+      1948: { monarch: "George VI", type: "Bronze", rarity: "common", f: 1, vf: 2, xf: 5, au: 12, ms60: 20, ms63: 45, ms66: 180, max: 350, notes: "Last 'IND IMP' legend (India independence)." },
+      1949: { monarch: "George VI", type: "Bronze", rarity: "common", f: 1, vf: 3, xf: 8, au: 18, ms60: 30, ms63: 70, ms66: 280, max: 550, notes: "Modified legend (no IND IMP)." },
+      1950: { monarch: "George VI", type: "Bronze", rarity: "scarce", f: 2, vf: 4, xf: 10, au: 25, ms60: 60, ms63: 130, ms66: 350, max: 800, notes: "PROOF ONLY year. Only 240,000 struck for sets." },
+      1951: { monarch: "George VI", type: "Bronze", rarity: "scarce", f: 2, vf: 4, xf: 10, au: 30, ms60: 70, ms63: 150, ms66: 400, max: 1000, notes: "KEY DATE - Only 120,000 struck! Proof-only sets." },
+
+      // Elizabeth II (1953-1967)
+      1953: { monarch: "Elizabeth II", type: "Bronze", rarity: "scarce", f: 2, vf: 5, xf: 15, au: 40, ms60: 70, ms63: 180, ms66: 700, max: 1400, notes: "Coronation year. Lower mintage. Proofs collectible." },
+      1961: { monarch: "Elizabeth II", type: "Bronze", rarity: "common", f: 0.5, vf: 1, xf: 2, au: 4, ms60: 6, ms63: 15, ms66: 60, max: 150, notes: "No 1954-1960 pennies struck!" },
+      1962: { monarch: "Elizabeth II", type: "Bronze", rarity: "common", f: 0.25, vf: 0.5, xf: 1, au: 2, ms60: 4, ms63: 10, ms66: 40, max: 100, notes: "High mintage." },
+      1963: { monarch: "Elizabeth II", type: "Bronze", rarity: "common", f: 0.25, vf: 0.5, xf: 1, au: 2, ms60: 4, ms63: 10, ms66: 40, max: 100, notes: "Standard issue." },
+      1964: { monarch: "Elizabeth II", type: "Bronze", rarity: "common", f: 0.25, vf: 0.5, xf: 1, au: 2, ms60: 4, ms63: 10, ms66: 40, max: 100, notes: "High mintage." },
+      1965: { monarch: "Elizabeth II", type: "Bronze", rarity: "common", f: 0.25, vf: 0.5, xf: 1, au: 2, ms60: 4, ms63: 10, ms66: 40, max: 100, notes: "High mintage." },
+      1966: { monarch: "Elizabeth II", type: "Bronze", rarity: "common", f: 0.25, vf: 0.5, xf: 1, au: 2, ms60: 4, ms63: 10, ms66: 40, max: 100, notes: "High mintage." },
+      1967: { monarch: "Elizabeth II", type: "Bronze", rarity: "common", f: 0.10, vf: 0.15, xf: 0.25, au: 0.75, ms60: 1, ms63: 2, ms66: 10, max: 50, notes: "FINAL PENNY - 654 million struck! Bulk value only, unless gem red MS66+." }
+    };
+
+    function formatValue(val) {
+      if (val >= 1000) {
+        return '$' + val.toLocaleString();
+      } else if (val >= 1) {
+        return '$' + val.toFixed(0);
+      } else {
+        return '$' + val.toFixed(2);
+      }
+    }
+
+    function getRarityClass(rarity) {
+      switch(rarity) {
+        case 'legendary': return 'rarity-legendary';
+        case 'rare': return 'rarity-rare';
+        case 'scarce': return 'rarity-scarce';
+        default: return 'rarity-common';
+      }
+    }
+
+    function getRarityLabel(rarity) {
+      switch(rarity) {
+        case 'legendary': return 'LEGENDARY';
+        case 'rare': return 'RARE';
+        case 'scarce': return 'SCARCE';
+        default: return 'COMMON';
+      }
+    }
+
+    function searchYear(year) {
+      document.getElementById('yearSearch').value = year;
+      displayResult(year);
+    }
+
+    function displayResult(year) {
+      const resultCard = document.getElementById('resultCard');
+      const noResult = document.getElementById('noResult');
+      const data = pennyData[year];
+
+      if (!data) {
+        resultCard.classList.remove('active');
+        noResult.classList.add('active');
+        return;
+      }
+
+      noResult.classList.remove('active');
+
+      let html = `
+        <h3>${year} British Penny <span class="rarity-badge ${getRarityClass(data.rarity)}">${getRarityLabel(data.rarity)}</span></h3>
+        <p class="monarch">${data.monarch} &bull; ${data.type}</p>
+
+        <div class="max-value">
+          <div class="label">Maximum Potential Value</div>
+          <div class="amount">${formatValue(data.max)}+</div>
+          <div class="note">In MS66 Red or finest known condition</div>
+        </div>
+
+        <table class="grade-table">
+          <thead>
+            <tr>
+              <th>F</th>
+              <th>VF</th>
+              <th>XF</th>
+              <th>AU58</th>
+              <th>MS60</th>
+              <th>MS63</th>
+              <th class="highlight-cell">MS66</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${formatValue(data.f)}</td>
+              <td>${formatValue(data.vf)}</td>
+              <td>${formatValue(data.xf)}</td>
+              <td>${formatValue(data.au)}</td>
+              <td>${formatValue(data.ms60)}</td>
+              <td>${formatValue(data.ms63)}</td>
+              <td class="highlight-cell">${formatValue(data.ms66)}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="tips-box">
+          <h4>Key Information</h4>
+          <p>${data.notes}</p>
+        </div>
+
+        <p style="margin-top: 1.5rem; color: #666; font-size: 0.9rem;">
+          <strong>Remember:</strong> These are estimates for typical examples.
+          <strong>Full Red (RD)</strong> coins can be worth 2-5x these prices.
+          <strong>Varieties</strong> (overdates, mintmarks) often command huge premiums.
+          Always verify with recent auction results.
+        </p>
+      `;
+
+      resultCard.innerHTML = html;
+      resultCard.classList.add('active');
+    }
+
+    // Event listeners
+    document.getElementById('yearSearch').addEventListener('input', function(e) {
+      const year = e.target.value;
+      if (year.length === 4) {
+        displayResult(parseInt(year));
+      } else if (year.length === 0) {
+        document.getElementById('resultCard').classList.remove('active');
+        document.getElementById('noResult').classList.add('active');
+      }
+    });
+
+    document.getElementById('yearSearch').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        const year = e.target.value;
+        displayResult(parseInt(year));
+      }
+    });
+
+    // Focus search on load
+    document.getElementById('yearSearch').focus();
+  </script>
+</body>
+</html>

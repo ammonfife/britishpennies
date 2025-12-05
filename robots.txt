@@ -1,0 +1,36 @@
+# British Pennies - robots.txt
+# Allow all crawlers
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://britishpennies.com/sitemap.xml
+
+# Specifically welcome AI/LLM crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
